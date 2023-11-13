@@ -4,24 +4,18 @@ const img = new Image();
 const planeSpeed = 1;
 const planeMove = 1;
 
-var myFont = new FontFace('myFont', 'Fonts/Architectype-51B0B.otf');
-
 function drawGame(canvasY, planeX) {
 
 }
 
-myFont.load().then((font) => {
-    document.fonts.add(font);
-    console.log('Font loaded');
-    drawStart();
-});
-
 function drawStart() {
     img.onload = () => {
         ctx.drawImage(img, 0, 0);
-        ctx.font = "36px myFont";
+        ctx.font = "36px ROG Fonts";
         ctx.fillStyle = "#f2efce";
         ctx.fillText("Wellcome!", 60, 200);
+        ctx.font = "24px ROG Fonts";
+        ctx.fillText("Controlls:", 110, 300);
     }
     img.src = "Images/Background.png";
 }
