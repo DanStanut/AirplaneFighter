@@ -73,22 +73,22 @@ class Enemy extends GameObject{
 class Plane extends GameObject{
     constructor(image) {
         super(PLANE_SIZE, image);
-        this.x = CANVAS_WIDTH / 2 - PLANE_SIZE / 2;
-        this.y = CANVAS_HEIGHT - PLANE_SIZE - 5;
+        this.x = CANVAS_WIDTH / 2 - PLANE_SIZE / 2; // set plane x position at the middle of the canvas
+        this.y = CANVAS_HEIGHT - PLANE_SIZE - 5; // set the plane y position to a 5 pixel offset from bottom
     }
 }
 
 class Projectile extends GameObject{
     constructor(image) {
         super(PLANE_SIZE, image);
-        this.x = CANVAS_WIDTH / 2 - PLANE_SIZE / 2;
-        this.y = CANVAS_HEIGHT - PLANE_SIZE - 5;
+        this.x = CANVAS_WIDTH / 2 - PLANE_SIZE / 2; // set projectile x position at the middle of the canvas
+        this.y = CANVAS_HEIGHT - PLANE_SIZE - 5; // set the projectile y position to a 5 pixel offset from bottom
     }
 
     update() {
         this.y -= PROJECTILE_SPEED;
-        if (this.y < -PLANE_SIZE) {
-            this.y = CANVAS_HEIGHT - PLANE_SIZE - 5;
+        if (this.y < 0) {
+            this.y = CANVAS_HEIGHT - PLANE_SIZE - 5; // reset projectile onto the plane
             projectileLaunch = false;
         }
     }
