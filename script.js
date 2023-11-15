@@ -11,16 +11,11 @@ const PLANE_SHIFT = 20;
 const PROJECTILE_SPEED = 10;
 
 //loading used images
-const background = new Image();
-background.src = "Images/Background.png";
-const planeImage = new Image();
-planeImage.src = "Images/Plane.png";
-const projectileImage = new Image();
-projectileImage.src = "Images/Projectile.png";
-const enemy1Image = new Image();
-enemy1Image.src = "Images/Enemy1.png";
-const enemy2Image = new Image();
-enemy2Image.src = "Images/Enemy2.png";
+const background = loadImage("Images/Background.png");
+const planeImage = loadImage("Images/Plane.png");
+const projectileImage = loadImage("Images/Projectile.png");
+const enemy1Image = loadImage("Images/Enemy1.png");
+const enemy2Image = loadImage("Images/Enemy2.png");
 
 //load custom font
 let myFont = new FontFace('myFont', 'url(Fonts/1942-webfont.woff)');
@@ -32,7 +27,7 @@ myFont.load().then(function(font){
 let gameOver = true;
 let projectileLaunch = false;
 let BackgroundYPos = -CANVAS_HEIGHT;
-let enemyesArray = [];
+let enemiesArray = [];
 let numberOfEnemies = 4;
 let enemiesImageArray = [enemy1Image, enemy2Image];
 let enemiesSizeArray = [ENEMY1_SIZE, ENEMY2_SIZE];
@@ -97,10 +92,16 @@ class Projectile extends GameObject{
 //object variables for the game
 for (let i = 0; i < numberOfEnemies; ++i) {
     let enemyType = Math.floor(Math.random() + 0.5);
-    enemyesArray.push(new Enemy(enemiesSizeArray[enemyType], enemiesImageArray[enemyType]));
+    enemiesArray.push(new Enemy(enemiesSizeArray[enemyType], enemiesImageArray[enemyType]));
 }
 let plane = new Plane(planeImage);
 let projectile = new Projectile(projectileImage);
+
+function loadImage(src) {
+    const image = new Image();
+    image.src = src;
+    return image;
+}
 
 function displaySpalshScreen() {
     context.fillStyle = "#145ea6";
@@ -123,7 +124,7 @@ function displaySpalshScreen() {
 function displayInfoText() {
     context.fillStyle = "#145ea6";
     context.beginPath();
-    context.roundRect(5, 5, 115 , 50, [10]);
+    context.roundRect(5, 5, 125 , 50, [10]);
     context.stroke();
     context.fill();
     context.fillStyle = "#faa300";
@@ -156,7 +157,7 @@ function drawGame() {
     if (gameOver) {
         displaySpalshScreen();
     } else {
-        enemyesArray.forEach(enemy => {
+        enemiesArray.forEach(enemy => {
             if (checkColision(enemy, plane)) {
                 --lives;
                 resetEnemy(enemy);
@@ -184,6 +185,11 @@ function drawGame() {
     requestAnimationFrame(drawGame);
 }
 
+function movePlane(amount) {
+    plane.x += amount;
+    projectile.x = plane.x;
+}
+
 window.addEventListener('keypress', function(e) {
     if (gameOver && e.code === 'Space') {
         gameOver = false;
@@ -191,12 +197,10 @@ window.addEventListener('keypress', function(e) {
         score = 0;
     }
     if (!gameOver && e.code === 'KeyA' && plane.x > 0) {
-        plane.x -= PLANE_SHIFT;
-        projectile.x = plane.x;
+        movePlane(-PLANE_SHIFT);
     }
     if (!gameOver && e.code === 'KeyD' && plane.x < CANVAS_WIDTH - PLANE_SIZE) {
-        plane.x += PLANE_SHIFT;
-        projectile.x = plane.x;
+        movePlane(PLANE_SHIFT)
     }
     if (!gameOver && e.code === 'Space') {
         projectileLaunch = true;
