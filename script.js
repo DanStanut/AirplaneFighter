@@ -1,3 +1,4 @@
+//game constants
 const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
 const CANVAS_WIDTH = canvas.width = 400;
@@ -9,7 +10,7 @@ const PLANE_SPEED = 3;
 const PLANE_SHIFT = 20;
 const PROJECTILE_SPEED = 10;
 
-// Loading used images
+//loading used images
 const background = new Image();
 background.src = "Images/Background.png";
 const planeImage = new Image();
@@ -22,7 +23,6 @@ const enemy2Image = new Image();
 enemy2Image.src = "Images/Enemy2.png";
 
 let myFont = new FontFace('myFont', 'url(Fonts/1942-webfont.woff)');
-
 myFont.load().then(function(font){
     document.fonts.add(font);
 });
@@ -38,13 +38,23 @@ let lives = 3;
 let score = 0;
 let lastScore = 0;
 
-class Enemy {
+class GameObject {
     constructor(size, image) {
         this.width = size;
         this.height = size;
+        this.image = image;
+    }
+
+    draw() {
+        context.drawImage(this.image, this.x, this.y);
+    }
+}
+
+class Enemy extends GameObject{
+    constructor(size, image) {
+        super(size, image);
         this.x = Math.floor(Math.random() * (canvas.width - this.width));
         this.y = Math.floor(Math.random() * 1000 - 1000 - this.height);
-        this.image = image;
         this.speed = Math.floor(Math.random() * PLANE_SPEED + 2);
     }
 
@@ -55,33 +65,21 @@ class Enemy {
             this.x = Math.floor(Math.random() * (canvas.width - this.width));
         }
     }
+}
 
-    draw() {
-        context.drawImage(this.image, this.x, this.y);
+class Plane extends GameObject{
+    constructor(image) {
+        super(PLANE_SIZE, image);
+        this.x = CANVAS_WIDTH / 2 - PLANE_SIZE / 2;
+        this.y = CANVAS_HEIGHT - PLANE_SIZE - 5;
     }
 }
 
-class Plane {
+class Projectile extends GameObject{
     constructor(image) {
+        super(PLANE_SIZE, image);
         this.x = CANVAS_WIDTH / 2 - PLANE_SIZE / 2;
         this.y = CANVAS_HEIGHT - PLANE_SIZE - 5;
-        this.width = PLANE_SIZE;
-        this.height = PLANE_SIZE;
-        this.image = image;
-    }
-
-    draw() {
-        context.drawImage(this.image, this.x, this.y);
-    }
-}
-
-class Projectile {
-    constructor(image) {
-        this.x = CANVAS_WIDTH / 2 - PLANE_SIZE / 2;
-        this.y = CANVAS_HEIGHT - PLANE_SIZE - 5;
-        this.width = PLANE_SIZE;
-        this.height = PLANE_SIZE;
-        this.image = image;
     }
 
     update() {
@@ -90,10 +88,6 @@ class Projectile {
             this.y = CANVAS_HEIGHT - PLANE_SIZE - 5;
             projectileLaunch = false;
         }
-    }
-
-    draw() {
-        context.drawImage(this.image, this.x, this.y);
     }
 }
 
@@ -139,6 +133,12 @@ function checkColision(object1, object2) {
     return (object1.x + object1.width > object2.x && object1.y + object1.height > object2.y && object1.x < object2.x + object2.width)
 }
 
+function resetEnemy(enemy) {
+    enemy.y = -ENEMY1_SIZE;
+    enemy.x = Math.floor(Math.random() * (canvas.width - enemy.width));
+    enemy.speed = Math.floor(Math.random() * PLANE_SPEED + 2);
+}
+
 function drawGame() {
     //Clear canvas and draw background
     context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -156,16 +156,12 @@ function drawGame() {
         enemyesArray.forEach(enemy => {
             if (checkColision(enemy, plane)) {
                 --lives;
-                enemy.y = -ENEMY1_SIZE;
-                enemy.x = Math.floor(Math.random() * (canvas.width - enemy.width));
-                enemy.speed = Math.floor(Math.random() * PLANE_SPEED + 2);
+                resetEnemy(enemy);
             }
             if (checkColision(enemy, projectile) && projectileLaunch) {
                 ++score;
                 lastScore = score;
-                enemy.y = -ENEMY1_SIZE;
-                enemy.x = Math.floor(Math.random() * (canvas.width - enemy.width));
-                enemy.speed = Math.floor(Math.random() * PLANE_SPEED + 2);
+                resetEnemy(enemy);
                 projectile.y = CANVAS_HEIGHT - PLANE_SIZE - 5;
                 projectileLaunch = false;
             }
