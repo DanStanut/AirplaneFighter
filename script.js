@@ -22,11 +22,13 @@ enemy1Image.src = "Images/Enemy1.png";
 const enemy2Image = new Image();
 enemy2Image.src = "Images/Enemy2.png";
 
+//load custom font
 let myFont = new FontFace('myFont', 'url(Fonts/1942-webfont.woff)');
 myFont.load().then(function(font){
     document.fonts.add(font);
 });
 
+//game variables
 let gameOver = true;
 let projectileLaunch = false;
 let BackgroundYPos = -CANVAS_HEIGHT;
@@ -38,6 +40,7 @@ let lives = 3;
 let score = 0;
 let lastScore = 0;
 
+//define game objects
 class GameObject {
     constructor(size, image) {
         this.width = size;
@@ -171,7 +174,7 @@ function drawGame() {
         if (projectileLaunch) {
             projectile.update(); 
         }
-        if (lives == 0) {
+        if (lives === 0) {
             gameOver = true;
         }
         projectile.draw();
@@ -189,11 +192,11 @@ window.addEventListener('keypress', function(e) {
     }
     if (!gameOver && e.code === 'KeyA' && plane.x > 0) {
         plane.x -= PLANE_SHIFT;
-        projectile.x -= PLANE_SHIFT;
+        projectile.x = plane.x;
     }
     if (!gameOver && e.code === 'KeyD' && plane.x < CANVAS_WIDTH - PLANE_SIZE) {
         plane.x += PLANE_SHIFT;
-        projectile.x += PLANE_SHIFT;
+        projectile.x = plane.x;
     }
     if (!gameOver && e.code === 'Space') {
         projectileLaunch = true;
