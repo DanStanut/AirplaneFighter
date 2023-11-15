@@ -6,8 +6,7 @@ const CANVAS_HEIGHT = canvas.height = 730;
 const PLANE_SIZE = 100;
 const ENEMY1_SIZE = 100;
 const ENEMY2_SIZE = 60;
-const PLANE_SPEED = 3;
-const PLANE_SHIFT = 20;
+const PLANE_SHIFT = 5;
 const PROJECTILE_SPEED = 10;
 
 //loading used images
@@ -28,9 +27,10 @@ let gameOver = true;
 let projectileLaunch = false;
 let BackgroundYPos = -CANVAS_HEIGHT;
 let enemiesArray = [];
-let numberOfEnemies = 4;
+let numberOfEnemies = 5;
 let enemiesImageArray = [enemy1Image, enemy2Image];
 let enemiesSizeArray = [ENEMY1_SIZE, ENEMY2_SIZE];
+let planeSpeed = 3;
 let lives = 3;
 let score = 0;
 let lastScore = 0;
@@ -53,7 +53,7 @@ class Enemy extends GameObject{
         super(size, image);
         this.x = Math.floor(Math.random() * (canvas.width - this.width));
         this.y = Math.floor(Math.random() * 1000 - 1000 - this.height);
-        this.speed = Math.floor(Math.random() * PLANE_SPEED + 2);
+        this.speed = Math.floor(Math.random() * planeSpeed + 2);
     }
 
     update() {
@@ -61,6 +61,7 @@ class Enemy extends GameObject{
         if (this.y > canvas.height) {
             this.y = -ENEMY1_SIZE;
             this.x = Math.floor(Math.random() * (canvas.width - this.width));
+            this.speed = Math.floor(Math.random() * planeSpeed + 2);
         }
     }
 }
@@ -91,7 +92,7 @@ class Projectile extends GameObject{
 
 //object variables for the game
 for (let i = 0; i < numberOfEnemies; ++i) {
-    let enemyType = Math.floor(Math.random() + 0.5);
+    let enemyType = Math.round(Math.random());
     enemiesArray.push(new Enemy(enemiesSizeArray[enemyType], enemiesImageArray[enemyType]));
 }
 let plane = new Plane(planeImage);
@@ -140,7 +141,7 @@ function checkColision(object1, object2) {
 function resetEnemy(enemy) {
     enemy.y = -ENEMY1_SIZE;
     enemy.x = Math.floor(Math.random() * (canvas.width - enemy.width));
-    enemy.speed = Math.floor(Math.random() * PLANE_SPEED + 2);
+    enemy.speed = Math.floor(Math.random() * planeSpeed + 2);
 }
 
 function drawGame() {
@@ -151,7 +152,7 @@ function drawGame() {
     if (BackgroundYPos > CANVAS_HEIGHT) {
         BackgroundYPos = -CANVAS_HEIGHT;
     } else {
-        BackgroundYPos += PLANE_SPEED;
+        BackgroundYPos += planeSpeed;
     }
     //game logic
     if (gameOver) {
@@ -164,6 +165,9 @@ function drawGame() {
             }
             if (checkColision(enemy, projectile) && projectileLaunch) {
                 ++score;
+                if (score % 50 === 0) {
+                    ++planeSpeed;
+                }
                 lastScore = score;
                 resetEnemy(enemy);
                 projectile.y = CANVAS_HEIGHT - PLANE_SIZE - 5;
@@ -177,6 +181,7 @@ function drawGame() {
         }
         if (lives === 0) {
             gameOver = true;
+            planeSpeed = 3;
         }
         projectile.draw();
         plane.draw();
