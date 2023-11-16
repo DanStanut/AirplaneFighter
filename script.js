@@ -26,8 +26,8 @@ myFont.load().then(function(font){
 let gameOver = true;
 let projectileLaunch = false;
 let BackgroundYPos = -CANVAS_HEIGHT;
-let enemiesArray = [];
 let numberOfEnemies = 5;
+let enemiesArray = [];
 let enemiesImageArray = [enemy1Image, enemy2Image];
 let enemiesSizeArray = [ENEMY1_SIZE, ENEMY2_SIZE];
 let planeSpeed = PLANE_SPEED;
@@ -99,6 +99,7 @@ for (let i = 0; i < numberOfEnemies; ++i) {
 let plane = new Plane(planeImage);
 let projectile = new Projectile(projectileImage);
 
+//game functions from here
 function loadImage(src) {
     const image = new Image();
     image.src = src;
@@ -115,11 +116,13 @@ function displaySpalshScreen() {
     context.font = "50px myFont";
     context.fillText("Wellcome!", 60, 200);
     context.font = "24px myFont";
-    context.fillText("Score: " + lastScore, 130, 234);
+    if (lastScore != 0) {
+        context.fillText("Score: " + lastScore, 130, 234);
+    }
     context.fillText("Controlls:", 130, 270);
     context.fillText("A, D: move", 130, 306);
     context.fillText("Space: fire", 120, 342);
-    context.fillText("Press space to start", 40, 500);
+    context.fillText("Press 'S' to start", 60, 500);
     context.drawImage(planeImage, 150, 370);
 }
 
@@ -197,22 +200,19 @@ function movePlane(amount) {
 }
 
 addEventListener('keydown', function(e) {
-    if (gameOver) {
-        if (e.code === 'Space') {
-            gameOver = false;
-            lives = 3;
-            score = 0;    
-        }
-    } else {
-        if (e.code === 'KeyA' && plane.x > 0) {
-            movePlane(-planeShift);
-        }
-        if (e.code === 'KeyD' && plane.x < CANVAS_WIDTH - PLANE_SIZE) {
-            movePlane(planeShift);
-        }
-        if (e.code === 'Space') {
-            projectileLaunch = true;
-        }
+    if (e.code === 'KeyS') {
+        gameOver = false;
+        lives = 3;
+        score = 0;    
+    }
+    if (e.code === 'KeyA' && plane.x > 0) {
+        movePlane(-planeShift);
+    }
+    if (e.code === 'KeyD' && plane.x < CANVAS_WIDTH - PLANE_SIZE) {
+        movePlane(planeShift);
+    }
+    if (e.code === 'Space') {
+        projectileLaunch = true;
     }
 })
 
