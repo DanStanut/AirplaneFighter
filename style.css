@@ -4,7 +4,7 @@ body {
 
 #gameCanvas {
     position: absolute;
-    border" 3px solid white;
+    border: 3px solid black;
     width: 400px;
     height: 730px;
     transform: translate(-50%, -50%);
