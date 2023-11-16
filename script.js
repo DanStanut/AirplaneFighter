@@ -6,8 +6,8 @@ const CANVAS_HEIGHT = canvas.height = 730;
 const PLANE_SIZE = 100;
 const ENEMY1_SIZE = 100;
 const ENEMY2_SIZE = 60;
-const PLANE_SHIFT = 5;
 const PROJECTILE_SPEED = 10;
+const PLANE_SPEED = 2;
 
 //loading used images
 const background = loadImage("Images/Background.png");
@@ -30,10 +30,11 @@ let enemiesArray = [];
 let numberOfEnemies = 5;
 let enemiesImageArray = [enemy1Image, enemy2Image];
 let enemiesSizeArray = [ENEMY1_SIZE, ENEMY2_SIZE];
-let planeSpeed = 3;
+let planeSpeed = PLANE_SPEED;
 let lives = 3;
 let score = 0;
 let lastScore = 0;
+let planeShift = 5;
 
 //define game objects
 class GameObject {
@@ -181,7 +182,7 @@ function drawGame() {
         }
         if (lives === 0) {
             gameOver = true;
-            planeSpeed = 3;
+            planeSpeed = PLANE_SPEED;
         }
         projectile.draw();
         plane.draw();
@@ -195,20 +196,23 @@ function movePlane(amount) {
     projectile.x = plane.x;
 }
 
-window.addEventListener('keypress', function(e) {
-    if (gameOver && e.code === 'Space') {
-        gameOver = false;
-        lives = 3;
-        score = 0;
-    }
-    if (!gameOver && e.code === 'KeyA' && plane.x > 0) {
-        movePlane(-PLANE_SHIFT);
-    }
-    if (!gameOver && e.code === 'KeyD' && plane.x < CANVAS_WIDTH - PLANE_SIZE) {
-        movePlane(PLANE_SHIFT)
-    }
-    if (!gameOver && e.code === 'Space') {
-        projectileLaunch = true;
+addEventListener('keydown', function(e) {
+    if (gameOver) {
+        if (e.code === 'Space') {
+            gameOver = false;
+            lives = 3;
+            score = 0;    
+        }
+    } else {
+        if (e.code === 'KeyA' && plane.x > 0) {
+            movePlane(-planeShift);
+        }
+        if (e.code === 'KeyD' && plane.x < CANVAS_WIDTH - PLANE_SIZE) {
+            movePlane(planeShift);
+        }
+        if (e.code === 'Space') {
+            projectileLaunch = true;
+        }
     }
 })
 
