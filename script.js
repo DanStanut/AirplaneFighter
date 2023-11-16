@@ -65,6 +65,16 @@ class Enemy extends GameObject{
             this.speed = Math.floor(Math.random() * planeSpeed + 2);
         }
     }
+
+    reset() {
+        this.y = -ENEMY1_SIZE;
+        this.x = Math.floor(Math.random() * (canvas.width - this.width));
+        this.speed = Math.floor(Math.random() * planeSpeed + 2);
+    }
+
+    checkCollision(object) {
+        return (this.x + this.width > object.x && this.y + this.height > object.y && this.x < object.x + object.width);
+    }
 }
 
 class Plane extends GameObject{
@@ -72,6 +82,13 @@ class Plane extends GameObject{
         super(PLANE_SIZE, image);
         this.x = CANVAS_WIDTH / 2 - PLANE_SIZE / 2; // set plane x position at the middle of the canvas
         this.y = CANVAS_HEIGHT - PLANE_SIZE - 5; // set the plane y position to a 5 pixel offset from bottom
+    }
+
+    update(amount) {
+        if (this.x > 0 || this.x < CANVAS_WIDTH - PLANE_SIZE) {
+            this.x += amount;
+            projectile.x = this.x;
+        }
     }
 }
 
@@ -89,23 +106,29 @@ class Projectile extends GameObject{
             projectileLaunch = false;
         }
     }
-}
 
-//object variables for the game
-for (let i = 0; i < numberOfEnemies; ++i) {
-    let enemyType = Math.round(Math.random());
-    enemiesArray.push(new Enemy(enemiesSizeArray[enemyType], enemiesImageArray[enemyType]));
+    reset() {
+        this.y = CANVAS_HEIGHT - PLANE_SIZE - 5;
+    }
 }
-let plane = new Plane(planeImage);
-let projectile = new Projectile(projectileImage);
-
-//game functions from here
+//load and init functions from here
 function loadImage(src) {
     const image = new Image();
     image.src = src;
     return image;
 }
 
+function initGameObjects() {
+    for (let i = 0; i < numberOfEnemies; ++i) {
+        let enemyType = Math.round(Math.random());
+        enemiesArray.push(new Enemy(enemiesSizeArray[enemyType], enemiesImageArray[enemyType]));
+    }
+    plane = new Plane(planeImage);
+    projectile = new Projectile(projectileImage);
+}
+initGameObjects();
+
+//game functions from here
 function displaySpalshScreen() {
     context.fillStyle = "#145ea6";
     context.beginPath();
@@ -138,18 +161,7 @@ function displayInfoText() {
     context.fillText("Lives: " + lives, 10, 45);
 }
 
-function checkColision(object1, object2) {
-    return (object1.x + object1.width > object2.x && object1.y + object1.height > object2.y && object1.x < object2.x + object2.width)
-}
-
-function resetEnemy(enemy) {
-    enemy.y = -ENEMY1_SIZE;
-    enemy.x = Math.floor(Math.random() * (canvas.width - enemy.width));
-    enemy.speed = Math.floor(Math.random() * planeSpeed + 2);
-}
-
-function drawGame() {
-    //Clear canvas and draw background
+function displayBackground() {
     context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     context.drawImage(background, 0, BackgroundYPos);
     context.drawImage(background, 0, BackgroundYPos - 2 * CANVAS_HEIGHT);
@@ -158,23 +170,27 @@ function drawGame() {
     } else {
         BackgroundYPos += planeSpeed;
     }
+}
+
+function drawGame() {
+    displayBackground();
     //game logic
     if (gameOver) {
         displaySpalshScreen();
     } else {
         enemiesArray.forEach(enemy => {
-            if (checkColision(enemy, plane)) {
+            if (enemy.checkCollision(plane)) {
                 --lives;
-                resetEnemy(enemy);
+                enemy.reset();
             }
-            if (checkColision(enemy, projectile) && projectileLaunch) {
+            if (enemy.checkCollision(projectile) && projectileLaunch) {
                 ++score;
                 if (score % 50 === 0) {
                     ++planeSpeed;
                 }
                 lastScore = score;
-                resetEnemy(enemy);
-                projectile.y = CANVAS_HEIGHT - PLANE_SIZE - 5;
+                enemy.reset();
+                projectile.reset();
                 projectileLaunch = false;
             }
             enemy.update();
@@ -194,22 +210,17 @@ function drawGame() {
     requestAnimationFrame(drawGame);
 }
 
-function movePlane(amount) {
-    plane.x += amount;
-    projectile.x = plane.x;
-}
-
 addEventListener('keydown', function(e) {
     if (e.code === 'KeyS') {
         gameOver = false;
         lives = 3;
-        score = 0;    
+        score = 0;
     }
-    if (e.code === 'KeyA' && plane.x > 0) {
-        movePlane(-planeShift);
+    if (e.code === 'KeyA') {
+        plane.update(-planeShift);
     }
-    if (e.code === 'KeyD' && plane.x < CANVAS_WIDTH - PLANE_SIZE) {
-        movePlane(planeShift);
+    if (e.code === 'KeyD') {
+        plane.update(planeShift);
     }
     if (e.code === 'Space') {
         projectileLaunch = true;
